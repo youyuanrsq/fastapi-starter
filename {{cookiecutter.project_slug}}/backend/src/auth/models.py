@@ -5,7 +5,7 @@ from src.models import Base
 
 
 class User(Base):
-    __tablename__ = "ai_middleware_user"
+    __tablename__ = "{{ cookiecutter.project_slug }}_user"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
