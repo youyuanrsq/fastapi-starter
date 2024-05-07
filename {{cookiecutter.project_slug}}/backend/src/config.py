@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     TEST_DATABASE_URL: Optional[PostgresDsn]
     DATABASE_URL: PostgresDsn
     ASYNC_DATABASE_URL: Optional[PostgresDsn]
+    SECRET_KEY: str
 
     @validator("DATABASE_URL", pre=True)
     def build_test_database_url(cls, v: Optional[str], values: Dict[str, Any]):
@@ -41,12 +42,6 @@ class Settings(BaseSettings):
         """Builds ASYNC_DATABASE_URL from DATABASE_URL."""
         v = values["DATABASE_URL"]
         return v.replace("postgresql", "postgresql+asyncpg", 1) if v else v
-
-    SECRET_KEY: str
-    QDRANT_HOST: str
-    COLLECTION_NAME: str
-
-    TEI_HOST: str
 
 
 settings = Settings()
