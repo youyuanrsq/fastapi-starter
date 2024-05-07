@@ -55,7 +55,7 @@ use [Cruft](https://cruft.github.io/cruft/), which is fully compatible with Cook
 
 ```bash
 pip3 install cruft
-cruft create https://github.com/gaganpreet/fastapi-starter
+cruft create https://github.com/youyuanrsq/fastapi-starter
 ```
 
 Using cruft will generate a metadata file named `.cruft.json` (don't delete it). Later on you can update to the current
