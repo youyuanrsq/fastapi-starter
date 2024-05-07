@@ -1,12 +1,12 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, DDL, event, text
 
 # models import is necessary for autogenerate to work
-from app import models
-from app.core.config import settings
-from app.db import Base
+from src.auth import models
+from src.config import settings
+from src.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -28,6 +28,10 @@ target_metadata = Base.metadata
 # ... etc.
 
 config.set_section_option("alembic", "sqlalchemy.url", settings.DATABASE_URL)
+
+
+def create_schema(metadata, connection):
+    connection.execute(text("CREATE SCHEMA IF NOT EXISTS backend_python"))
 
 
 def run_migrations_offline():
@@ -69,7 +73,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
-
+        create_schema(target_metadata, connection)
         with context.begin_transaction():
             context.run_migrations()
 

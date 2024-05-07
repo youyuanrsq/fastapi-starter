@@ -7,12 +7,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - app-db-data:/var/lib/postgresql/data:cached
+      - src-db-data:/var/lib/postgresql/data:cached
 
   backend:
-    command: uvicorn --port {{ cookiecutter.backend_port }} --host 0.0.0.0 --reload main:app
+    command: uvicorn --port {{ cookiecutter.backend_port }} --host 0.0.0.0 --reload main:src
     volumes:
-      - ./backend:/app:delegated
+      - ./backend:/src:delegated
       - root-home:/root:delegated
     depends_on:
       postgres:

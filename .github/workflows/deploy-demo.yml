@@ -1,23 +1,23 @@
 name: Deploy demo to Fly
 on:
   workflow_run:
-    workflows: [Cookie cutter test]
-    branches: [main]
+    workflows: [ Cookie cutter test ]
+    branches: [ main ]
     types:
       - completed
 env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 jobs:
   deploy:
-      if: ${{ github.event.workflow_run.conclusion == 'success' }}
-      timeout-minutes: 15
-      name: Deploy app
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-        - uses: superfly/flyctl-actions/setup-flyctl@master
-        - name: Install dependencies
-          run: |
-            apk update && apk add py3-pip python3
-            pip3 install cookiecutter
-        - run: bash scripts/deploy-demo-project-to-fly.sh
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    timeout-minutes: 15
+    name: Deploy src
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Install dependencies
+        run: |
+          apk update && apk add py3-pip python3
+          pip3 install cookiecutter
+      - run: bash scripts/deploy-demo-project-to-fly.sh
