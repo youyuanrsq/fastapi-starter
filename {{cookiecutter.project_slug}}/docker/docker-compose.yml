@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+    backend:
+        build:
+            context: backend
+        ports:
+            - "{{ cookiecutter.backend_port }}:{{ cookiecutter.backend_port }}"
+        volumes:
+            - "${WORKSPACE:-/workspace}/${NAMESPACE:-{{ cookiecutter.project_slug }}}/ava_workspace/log/{{ cookiecutter.project_slug }}/log:/logs"
+        env_file: .env

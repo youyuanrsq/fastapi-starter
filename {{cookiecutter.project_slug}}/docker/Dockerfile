@@ -21,11 +21,11 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
-COPY ./pyproject.toml ./poetry.lock* /src/
+COPY ./backend/pyproject.toml ./backend/poetry.lock* /src/
 
 RUN poetry install --no-root
 
-COPY . /src
+COPY ./backend /src
 
 # Final stage with slim image
 FROM python:3.10-slim
