@@ -1,129 +1,75 @@
-# FastAPI-Starter
+# {{ cookiecutter.project_name }}
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/gaganpreet/fastapi-starter/cookiecutter-project-test.yml)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/gaganpreet/fastapi-starter/main)
+## 开发与部署
 
-A FastAPI based starter that relies heavily on existing plugins/frameworks. Integrates with OpenAPI Generator for a
-Typescript client, FastAPI Users for authentication, async-first with SQLAlchemy 2.0.
+### 部署
 
----
+首先需要按照env-template文件创建.env文件，然后填入对应的配置。
 
-## Features
-
-- Uses **best practices**: Factory pattern and environment variables for configuration
-- User registration, models, authentication using [**FastAPI Users**](https://github.com/fastapi-users/fastapi-users)
-- Modern admin interface using [**React-Admin**](https://marmelab.com/react-admin/)
-- **Github Action** for building docker images and running automated tests
-- **Dependabot** config to keep project dependencies up to date
-- Create Typescript bindings for front-end automatically from OpenAPI spec using [**OpenAPI-Generator
-  **](https://github.com/OpenAPITools/openapi-generator/), no need to write/update code when backend changes
-- Async-first codebase with **SQLAlchemy 2.0** and Alembic for database migrations
-- **pytest** with example tests included
-- Integration tests with **Cypress**
-- Docker images for frontend and backend
-- Includes extra Dockerfile (backend serves frontend) for straightforward production deployment
-- Pre-commit hooks
-  with [Black](https://github.com/psf/black), [autoflake](https://github.com/PyCQA/autoflake), [isort](https://github.com/pycqa/isort), [flake8](https://github.com/PyCQA/flake8), [prettier](https://github.com/prettier/prettier), [eslint](https://github.com/eslint/eslint)
-  for consistent code standards
-
-## How to use
-
-You need Python 3 and pip installed locally. Run the [cookiecutter](https://cookiecutter.readthedocs.io) command (at
-least 1.7) and you'll be asked a few prompts.
+在本地通过docker-compose启动
 
 ```bash
-pip3 install cookiecutter
-cookiecutter https://github.com/youyuanrsq/fastapi-starter
+docker-compose up -d
+
+# 数据库迁移
+
+```shell
+
+docker-compose exec backend alembic upgrade head
 ```
 
-### Input variables
+启动后就可以通过这个URL访问OpenAPI文档
 
-The generator (cookiecutter) will ask you for some data, you might want to have at hand before generating the project.
+- 后端OpenAPI文档: "http://localhost:{{ cookiecutter.backend_port }}/docs/"
 
-The input variables, with their default values [default value], are:
+打开这个链接后可以看到FastAPI提供的可交互式的API文档，可以直接在这里进行测试。
 
-* `project_name`: The name of the project
-* `project_slug`: The development-friendly name of the project. By default, based on the project name.
-* `backend_port`: The backend port on the localhost.
-* `front_end_port`: The frontend port on the localhost.
+### 本地开发
 
-If you want to keep up to date with upstream changes (i.e. changes in this template), then it's better to
-use [Cruft](https://cruft.github.io/cruft/), which is fully compatible with Cookiecutter.
+后端服务起来后会挂载src目录，并且会自动识别到代码的改动，自动重启服务，这一点非常方便在本地开发。
+
+#### Poetry 环境搭建
+
+在本地开发时，需要[安装](https://python-poetry.org/docs/)poetry，然后通过poetry安装依赖。
 
 ```bash
-pip3 install cruft
-cruft create https://github.com/youyuanrsq/fastapi-starter
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-Using cruft will generate a metadata file named `.cruft.json` (don't delete it). Later on you can update to the current
-version of this cookiecutter and import the changes to your generated project by running this command:
+安装好Poetry后，在/backend目录下执行命令来安装对应的环境：
 
 ```bash
-cruft update
+poetry install
 ```
 
-## Objectives
+如果需要增加新的依赖，比如增加新的包，可以通过以下命令来安装：
 
-- Sane defaults with few prompts
-- Secure
-- KISS principle
+```bash
+poetry add <package_name>
+```
 
-## Preview
+### 重新构建容器
 
-#### View [live demo](https://demo-project-fastapi-starter.fly.dev) here.
+如果增加了新的依赖，那么需要通过以下命令重新构建容器：
 
-![Login page](assets/login.png)
+```bash
+docker-compose up -d --build
+```
 
-![Item page](assets/items.png)
+### 数据库迁移/更新
 
-## Features not included
+使用alembic进行数据库迁移时，主要使用这两个命令。更多信息请参考[Alembic's tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html)。
 
-The following features were left out in favour of simplicity:
+```bash
+# 自动生成一个 revision
+docker-compose exec backend alembic revision --autogenerate -m 'message'
 
-- Celery/Flower/Redis - Not needed for simple projects, Celery can be easily replaced
-  with [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/).
-- Traefik configuration - I prefer [NGINX Proxy automation](https://github.com/evertramos/nginx-proxy-automation)
+# 将最新的改动同步到数据库
+docker-compose exec backend alembic upgrade head
+```
 
-### Things to do
+如果增加了一个新的package，如completion，那么都需要将其中的models import到`./backend/alembic/env.py`
+中，否则alembic无法识别到新的models。
 
-- [ ] Migrate to Ruff
-- [ ] Email templates
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nadavof"><img src="https://avatars.githubusercontent.com/u/93834717?v=4?s=100" width="100px;" alt="nadavof"/><br /><sub><b>nadavof</b></sub></a><br /><a href="https://github.com/gaganpreet/fastapi-starter/commits?author=nadavof" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://dustindavis.me/"><img src="https://avatars.githubusercontent.com/u/177353?v=4?s=100" width="100px;" alt="Dustin Davis"/><br /><sub><b>Dustin Davis</b></sub></a><br /><a href="https://github.com/gaganpreet/fastapi-starter/commits?author=djedi" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/hugo-tinoco/"><img src="https://avatars.githubusercontent.com/u/43675476?v=4?s=100" width="100px;" alt="Hugo Tinoco"/><br /><sub><b>Hugo Tinoco</b></sub></a><br /><a href="https://github.com/gaganpreet/fastapi-starter/commits?author=h4ndzdatm0ld" title="Documentation">📖</a> <a href="https://github.com/gaganpreet/fastapi-starter/commits?author=h4ndzdatm0ld" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://mixedneeds.com/"><img src="https://avatars.githubusercontent.com/u/158175?v=4?s=100" width="100px;" alt="Michael Bunsen"/><br /><sub><b>Michael Bunsen</b></sub></a><br /><a href="https://github.com/gaganpreet/fastapi-starter/commits?author=mihow" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alexey-sveshnikov"><img src="https://avatars.githubusercontent.com/u/447089?v=4?s=100" width="100px;" alt="Alexey Sveshnikov"/><br /><sub><b>Alexey Sveshnikov</b></sub></a><br /><a href="https://github.com/gaganpreet/fastapi-starter/commits?author=alexey-sveshnikov" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td align="center" size="13px" colspan="7">
-        <img src="https://raw.githubusercontent.com/all-contributors/all-contributors-cli/1b8533af435da9854653492b1327a23a4dbd0a10/assets/logo-small.svg">
-          <a href="https://all-contributors.js.org/docs/en/bot/usage">Add your contributions</a>
-        </img>
-      </td>
-    </tr>
-  </tfoot>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
-Contributions of any kind welcome!
+当有新的models或者改动了原先的models，需要同步到数据库时，需要先执行`alembic revision --autogenerate -m 'message'`
+来生成一个revision，然后再执行`alembic upgrade head`来同步到数据库。
